@@ -1,0 +1,15 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django = "==3.2"
+djangorestframework = "*"
+django-keycloak = {git = "https://github.com/Peter-Slump/django-keycloak.git"}
+psycopg2 = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.9"

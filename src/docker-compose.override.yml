@@ -1,0 +1,58 @@
+version: '3.4'
+
+services:
+  keycloak.db:
+    container_name: keycloak.db
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+    volumes:
+      - keycloak.db_data:/var/lib/postgresql/data
+    restart: always
+  
+  catalog.db:
+    container_name: catalog.db
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: pl_admin
+      POSTGRES_PASSWORD: admin#1234
+    volumes:
+      - catalog.db_data:/var/lib/postgresql/data
+    restart: always
+  
+  rabbitmq:
+    container_name: rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    restart: always
+
+  keycloak:
+    container_name: keycloak
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: keycloak.db
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_SCHEMA: public
+      DB_PASSWORD: password
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: Pa55w0rd
+    ports:
+      - 8080:8080
+    depends_on:
+      - keycloak.db
+  
+  catalog.api:
+    container_name: catalog.api
+    ports:
+      - 5000:5000
+    command: python manage.py runserver 0.0.0.0:5000
+    environment:
+      POSTGRES_NAME: postgres
+      POSTGRES_HOST: catalog.db
+      POSTGRES_USER: pl_admin
+      POSTGRES_PASS: admin#1234
+    depends_on:
+      - catalog.db

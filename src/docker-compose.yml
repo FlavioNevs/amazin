@@ -1,19 +1,30 @@
-version: "3.2"
+version: '3'
 
 services:
-  # RabitMQ
+  # Databases
+  keycloak.db:
+    image: postgres
+
+  catalog.db:
+    image: postgres
+
+
+  # Third-Party
+  keycloak:
+    image: quay.io/keycloak/keycloak:legacy
+
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    container_name: 'rabbitmq'
-    ports:
-        - 5672:5672
-        - 15672:15672
-    volumes:
-        - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
-        - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
-    networks:
-        - rabbitmq_go_net
+  
+  
+  # Apps
+  catalog.api:
+    image: ${DOCKER_REGISTRY-}catalog.api
+    build:
+      context: .
+      dockerfile: Services/Catalog/Dockerfile
 
-networks:
-  rabbitmq_go_net:
-    driver: bridge
+
+volumes:
+  keycloak.db_data: 
+  catalog.db_data: 
